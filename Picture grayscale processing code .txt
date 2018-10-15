@@ -1,0 +1,39 @@
+>> I = imread('File Path'); 
+I=rgb2gray(I);  %Grayscale
+  
+%Draw a histogram 
+[m,n]=size(I); 
+GP=zeros(1,256);
+for k=0:255 
+     GP(k+1)=length(find(I==k))/(m*n);  %Calculate the probability of occurrence of each level of gray, and store it in GP
+ end 
+ 
+%Histogram equalization 
+S1=zeros(1,256); 
+for i=1:256
+    for j=1:i 
+          S1(i)=GP(j)+S1(i);
+    end 
+end 
+S2=round((S1*256)+0.5); %Put Sk to the gray level of the nearest level
+for i=1:256 
+    GPeq(i)=sum(GP(find(S2==i)));%Calculate the probability of each existing gray level
+end 
+figure;
+subplot(221);bar(0:255,GP,'b');  
+title('Original image histogram')
+ 
+subplot(222);bar(0:255,GPeq,'b') 
+title('Equalated histogram')
+ 
+X=I;
+for i=0:255
+    X(find(I==i)) = S2(i+1);
+end
+ 
+subplot(223);imshow(I);
+title('Original image');
+subplot(224);imshow(X);
+title('Histogram equalized image');
+imwrite(I,'File Output Path');
+imwrite(X,'File Output Path');
